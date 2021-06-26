@@ -39,7 +39,7 @@ class Bird:
         return self.time_alive / 100.0
 
     def jump_up(self):
-        self.jump = 5.5
+        self.jump = 5
 
     def died(self, pipe):
         if(self.pos[1] < 0 or self.pos[1] > 800):
@@ -50,11 +50,12 @@ class Bird:
         if player.colliderect(pipe):
             self.alive = False
 
-    def update(self, pipe):
+    def update(self, pipes):
         self.jump -= 0.25
         self.time_alive += 1
         self.pos[1] -= self.jump
-        self.died(pipe)
+        for pipe in pipes:
+            self.died(pipe)
 
 class Pipe:
     def __init__(self, type, height):
@@ -73,7 +74,7 @@ class Pipe:
 
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
 
-        self.speed = -5
+        self.speed = -2
         self.onscreen = True
 
     def draw(self, screen):
@@ -119,7 +120,7 @@ def run_game(genomes, config):
             if event.type == pygame.QUIT:
                 sys.exit(0)
 
-        clock.tick(40)
+        clock.tick(120)
         #screen.fill((255, 255, 255))
         screen.blit(background, (0,0))
 
@@ -137,8 +138,7 @@ def run_game(genomes, config):
         for i, bird in enumerate(birds):
             if bird.is_alive():
                 living += 1
-                for pipe in pipes:
-                    bird.update(pipe)
+                bird.update(pipes)
                 genomes[i][1].fitness += bird.get_reward()
 
         if living == 0:
